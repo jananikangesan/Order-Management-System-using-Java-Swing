@@ -39,10 +39,13 @@ public class MainFrame extends javax.swing.JFrame  implements ActionListener{
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        orderButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         orderButton.setText("Order");
 
+        itemButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         itemButton.setText("Item");
 
+        customerButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         customerButton.setText("Customer");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -56,7 +59,7 @@ public class MainFrame extends javax.swing.JFrame  implements ActionListener{
                 .addComponent(itemButton)
                 .addGap(34, 34, 34)
                 .addComponent(orderButton)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -66,7 +69,7 @@ public class MainFrame extends javax.swing.JFrame  implements ActionListener{
                     .addComponent(orderButton)
                     .addComponent(itemButton)
                     .addComponent(customerButton))
-                .addContainerGap(185, Short.MAX_VALUE))
+                .addContainerGap(181, Short.MAX_VALUE))
         );
 
         pack();
