@@ -33,43 +33,63 @@ public class MainFrame extends javax.swing.JFrame  implements ActionListener{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        orderButton = new javax.swing.JButton();
-        itemButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
         customerButton = new javax.swing.JButton();
+        itemButton = new javax.swing.JButton();
+        orderButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        orderButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        orderButton.setText("Order");
+        jPanel1.setBackground(new java.awt.Color(255, 51, 153));
 
+        customerButton.setBackground(new java.awt.Color(255, 255, 204));
+        customerButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        customerButton.setText("Customer");
+
+        itemButton.setBackground(new java.awt.Color(204, 255, 204));
         itemButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         itemButton.setText("Item");
 
-        customerButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        customerButton.setText("Customer");
+        orderButton.setBackground(new java.awt.Color(204, 204, 255));
+        orderButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        orderButton.setText("Order");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(customerButton)
+                .addGap(39, 39, 39)
+                .addComponent(itemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
+                .addComponent(orderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(35, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(131, 131, 131)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(customerButton)
+                    .addComponent(itemButton)
+                    .addComponent(orderButton))
+                .addContainerGap(161, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(customerButton)
-                .addGap(36, 36, 36)
-                .addComponent(itemButton)
-                .addGap(34, 34, 34)
-                .addComponent(orderButton)
-                .addContainerGap(62, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(92, 92, 92)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(orderButton)
-                    .addComponent(itemButton)
-                    .addComponent(customerButton))
-                .addContainerGap(181, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 6, Short.MAX_VALUE))
         );
 
         pack();
@@ -129,6 +149,8 @@ private void openOrderFrame() {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton customerButton;
     private javax.swing.JButton itemButton;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton orderButton;
     // End of variables declaration//GEN-END:variables
 
