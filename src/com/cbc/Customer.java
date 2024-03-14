@@ -237,9 +237,8 @@ public class Customer extends javax.swing.JFrame {
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
     }
+    
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         // TODO add your handling code here:
         String cust_id=txtcustId.getText();
@@ -328,7 +327,7 @@ public class Customer extends javax.swing.JFrame {
              
              String id=Df.getValueAt(selectedIndex,0).toString();
              
-             int dialogResult=JOptionPane.showConfirmDialog(null, "Do you want to delete the customer record","Warning",JOptionPane.YES_NO_OPTION);
+             int dialogResult=JOptionPane.showConfirmDialog(null, "Do you want to delete this customer record","Warning",JOptionPane.YES_NO_OPTION);
              
              if(dialogResult==JOptionPane.YES_OPTION){
                 Class.forName("com.mysql.jdbc.Driver");

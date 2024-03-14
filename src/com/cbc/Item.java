@@ -4,6 +4,18 @@
  */
 package com.cbc;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author admin
@@ -15,6 +27,7 @@ public class Item extends javax.swing.JFrame {
      */
     public Item() {
         initComponents();
+        itemTable_update();
     }
 
     /**
@@ -63,12 +76,27 @@ public class Item extends javax.swing.JFrame {
 
         addButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         addButton.setText("Add");
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
 
         updateButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         updateButton.setText("Update");
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateButtonActionPerformed(evt);
+            }
+        });
 
         deleteButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         deleteButton.setText("Delete");
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -157,6 +185,11 @@ public class Item extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
+        itemTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                itemTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(itemTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -189,6 +222,158 @@ public class Item extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    Connection con;
+    PreparedStatement ps;
+    
+     private void itemTable_update(){
+        
+        int c;
+         try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con= DriverManager.getConnection("jdbc:mysql://localhost/order_management","root","");
+            ps=con.prepareStatement("select * from item");
+           
+            ResultSet rs=ps.executeQuery();
+            ResultSetMetaData Rss=rs.getMetaData();
+            c=Rss.getColumnCount();
+            
+            DefaultTableModel Df=(DefaultTableModel) itemTable.getModel();
+            Df.setRowCount(0);
+            
+            while(rs.next()){
+                Vector v2=new Vector();
+                
+                for(int a=1;a<=c;a++){
+                    v2.add(rs.getString("item_id"));
+                    v2.add(rs.getString("item_name"));
+                    v2.add(rs.getDouble("unit_price"));
+                    v2.add(rs.getInt("qty_on_hand"));
+                }
+                Df.addRow(v2);
+            }   
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        // TODO add your handling code here:
+        String item_id=txtitemId.getText();
+        String item_name=txtitemName.getText();
+        String unit_price=txtunitPrice.getText();
+        String qty_on_hand=txtQtyOnHand.getText();
+        
+         try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con= DriverManager.getConnection("jdbc:mysql://localhost/order_management","root","");
+            ps=con.prepareStatement("insert into item(item_id,item_name,unit_price,qty_on_hand) values(?,?,?,?)");
+            ps.setString(1,item_id);
+            ps.setString(2,item_name);
+            ps.setString(3,unit_price);
+            ps.setString(4, qty_on_hand);
+            
+            ps.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Item is Added");
+            itemTable_update();
+            
+            txtitemId.setText("");
+            txtitemName.setText("");
+            txtunitPrice.setText("");
+            txtQtyOnHand.setText("");
+            
+            txtitemId.requestFocus();
+            
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Item.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel Df=(DefaultTableModel) itemTable.getModel();
+         int selectedIndex=itemTable.getSelectedRow();
+         
+         try {
+             
+             String id=Df.getValueAt(selectedIndex,0).toString();
+             
+             String item_id=txtitemId.getText();
+             String item_name=txtitemName.getText();
+             String unit_price=txtunitPrice.getText();
+             String qty_on_hand=txtQtyOnHand.getText();
+                
+        
+            Class.forName("com.mysql.jdbc.Driver");
+            con= DriverManager.getConnection("jdbc:mysql://localhost/order_management","root","");
+            ps=con.prepareStatement("update item set item_id=?,item_name=?,unit_price=?,qty_on_hand=? where item_id=?");
+            ps.setString(1,item_id);
+            ps.setString(2,item_name);
+            ps.setString(3,unit_price);
+            ps.setString(4, qty_on_hand);
+            ps.setString(5,id);
+            ps.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Item is Updated");
+            
+            itemTable_update();
+            
+            txtitemId.setText("");
+            txtitemName.setText("");
+            txtunitPrice.setText("");
+            txtQtyOnHand.setText("");
+            
+            txtitemId.requestFocus();
+            
+            
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_updateButtonActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel Df=(DefaultTableModel) itemTable.getModel();
+         int selectedIndex=itemTable.getSelectedRow();
+         
+         try {
+             
+             String id=Df.getValueAt(selectedIndex,0).toString();
+             
+             int dialogResult=JOptionPane.showConfirmDialog(null, "Do you want to delete this item record","Warning",JOptionPane.YES_NO_OPTION);
+             
+             if(dialogResult==JOptionPane.YES_OPTION){
+                Class.forName("com.mysql.jdbc.Driver");
+                con= DriverManager.getConnection("jdbc:mysql://localhost/order_management","root","");
+                ps=con.prepareStatement("delete from item where item_id=?");
+                ps.setString(1,id);
+                ps.executeUpdate();
+            
+                JOptionPane.showMessageDialog(this, "Item is Deleted");
+                itemTable_update();
+                
+                txtitemId.setText("");
+                txtitemName.setText("");
+                txtunitPrice.setText("");
+                txtQtyOnHand.setText("");
+            
+                txtitemId.requestFocus();
+           
+             }        
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void itemTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_itemTableMouseClicked
+        // TODO add your handling code here:
+        DefaultTableModel Df=(DefaultTableModel) itemTable.getModel();
+        int selectedIndex=itemTable.getSelectedRow();
+         
+         txtitemId.setText(Df.getValueAt(selectedIndex, 0).toString());
+         txtitemName.setText(Df.getValueAt(selectedIndex, 1).toString());
+         txtunitPrice.setText(Df.getValueAt(selectedIndex, 2).toString());
+         txtQtyOnHand.setText(Df.getValueAt(selectedIndex, 3).toString());
+    }//GEN-LAST:event_itemTableMouseClicked
 
     /**
      * @param args the command line arguments
