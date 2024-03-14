@@ -4,6 +4,14 @@
  */
 package com.cbc;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author admin
@@ -15,7 +23,12 @@ public class PlaceOrder extends javax.swing.JFrame {
      */
     public PlaceOrder() {
         initComponents();
+        connect();
         initBackButton();
+        AddComboBoxData();
+        
+        CustIdCombo.addActionListener(this::ComboActionPerformed);
+        itemIdCombo.addActionListener(this::ComboActionPerformed);
     }
 
     /**
@@ -31,8 +44,8 @@ public class PlaceOrder extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        txtcustName = new javax.swing.JTextField();
+        CustIdCombo = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
@@ -42,11 +55,11 @@ public class PlaceOrder extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jTextField3 = new javax.swing.JTextField();
+        itemIdCombo = new javax.swing.JComboBox<>();
+        txtdescription = new javax.swing.JTextField();
         jTextField5 = new javax.swing.JTextField();
-        jTextField6 = new javax.swing.JTextField();
-        jTextField7 = new javax.swing.JTextField();
+        txtUnitPrice = new javax.swing.JTextField();
+        txtQtyOnHand = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel11 = new javax.swing.JLabel();
@@ -67,7 +80,7 @@ public class PlaceOrder extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setText("Customer Name");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        CustIdCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setText("Order Id");
@@ -90,7 +103,7 @@ public class PlaceOrder extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel10.setText("Qty On Hand");
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        itemIdCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -101,7 +114,7 @@ public class PlaceOrder extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Item Code", "Description", "Qty", "Unit Price", "Qty On Hand"
+                "Item Code", "Description", "Qty", "Unit Price", "Amount"
             }
         ) {
             Class[] types = new Class [] {
@@ -149,8 +162,8 @@ public class PlaceOrder extends javax.swing.JFrame {
                             .addComponent(jLabel2))
                         .addGap(31, 31, 31)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(CustIdCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtcustName, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5)
@@ -182,11 +195,11 @@ public class PlaceOrder extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(itemIdCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(30, 30, 30)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(txtdescription, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(30, 30, 30)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -194,11 +207,11 @@ public class PlaceOrder extends javax.swing.JFrame {
                                 .addGap(32, 32, 32)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel9)
-                                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(txtUnitPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(39, 39, 39)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtQtyOnHand, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(26, 26, 26)
                                         .addComponent(jButton2))
                                     .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -214,12 +227,12 @@ public class PlaceOrder extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(CustIdCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtcustName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
                     .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(27, 27, 27)
@@ -233,11 +246,11 @@ public class PlaceOrder extends javax.swing.JFrame {
                     .addComponent(jLabel10))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(itemIdCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtdescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtUnitPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtQtyOnHand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2))
                 .addGap(25, 25, 25)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -255,7 +268,20 @@ public class PlaceOrder extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    Connection con;
+    PreparedStatement psCustData,psItemData ;
+    
+    public void connect() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con= DriverManager.getConnection("jdbc:mysql://localhost/order_management","root","");
+            System.out.println("Connected to the database");
 
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println(e);
+        }
+
+    }
     private void initBackButton() {
        
         backButton.addActionListener(e -> {
@@ -265,6 +291,90 @@ public class PlaceOrder extends javax.swing.JFrame {
         });
         add(backButton);
         backButton.setBounds(20, 485, 100, 30); // Adjust position and size as needed
+    }
+     public void AddComboBoxData() {
+            try {
+                psCustData = con.prepareStatement("select * from customer");
+                ResultSet rsCust = psCustData.executeQuery();
+                
+                  while (rsCust.next()) {
+                    // Populate both customer ID and customer name in the combo box
+                    String customerId = rsCust.getString(1);
+                    CustIdCombo.addItem(customerId);
+                }
+
+
+                psItemData = con.prepareStatement("select * from item"); // Changed from psCustData to psItemData
+                ResultSet rsItem = psItemData.executeQuery(); // 
+
+              
+                while (rsItem.next()) {
+                    String itemId = rsItem.getString(1);
+                    itemIdCombo.addItem(itemId);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+    }
+
+
+    private void ComboActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        // Get the selected item from the combo box
+        String selectedCustomer = (String) CustIdCombo.getSelectedItem();
+        // Update the text field with the selected customer's name
+        txtcustName.setText(getCustomerName(selectedCustomer));
+
+        // Get the selected item from the combo box
+        String selectedItem = (String) itemIdCombo.getSelectedItem();
+        System.out.println("Selected item: " + selectedItem); // Debug message
+
+        // Retrieve item details based on the selected item
+        ResultSet itemDetails = getItem(selectedItem);
+        try {
+            // Check if the result set is not null and has data
+            if (itemDetails != null && itemDetails.next()) {
+                // Set the description and unit price text fields with the retrieved data
+                txtdescription.setText(itemDetails.getString("item_name"));
+                txtUnitPrice.setText(itemDetails.getString("unit_price"));
+                txtQtyOnHand.setText(itemDetails.getString("qty_on_hand"));
+            } else {
+                System.out.println("No item details found for item code: " + selectedItem); // Debug message
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(PlaceOrder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    }
+                                          
+
+    // Method to retrieve customer name based on customer ID
+    private String getCustomerName(String customerId) {
+        String customerName = "";
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT cust_name FROM customer WHERE cust_id = ?");
+            ps.setString(1, customerId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                customerName = rs.getString("cust_name");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return customerName;
+    }
+     private ResultSet getItem(String itemId) {
+       
+        ResultSet rs = null;
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM item WHERE item_id = ?");
+            ps.setString(1, itemId);
+             rs = ps.executeQuery();
+            
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        return rs;
     }
     /**
      * @param args the command line arguments
@@ -302,12 +412,12 @@ public class PlaceOrder extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> CustIdCombo;
     private javax.swing.JButton backButton;
+    private javax.swing.JComboBox<String> itemIdCombo;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -322,13 +432,13 @@ public class PlaceOrder extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
+    private javax.swing.JTextField txtQtyOnHand;
+    private javax.swing.JTextField txtUnitPrice;
+    private javax.swing.JTextField txtcustName;
+    private javax.swing.JTextField txtdescription;
     // End of variables declaration//GEN-END:variables
 }
