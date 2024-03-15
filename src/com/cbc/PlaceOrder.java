@@ -4,11 +4,15 @@
  */
 package com.cbc;
 
+import com.cbc.model.OrderItem;
+import com.google.gson.Gson;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -17,12 +21,15 @@ import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author admin
+ * 
  */
 public class PlaceOrder extends javax.swing.JFrame {
 
     /**
      * Creates new form PlaceOrder
      */
+    Connection con;
+    PreparedStatement psCustData,psItemData ;
     public PlaceOrder() {
         initComponents();
         connect();
@@ -78,8 +85,8 @@ public class PlaceOrder extends javax.swing.JFrame {
         CustIdCombo = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
+        txtorderId = new javax.swing.JTextField();
+        txtorderDate = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -95,7 +102,7 @@ public class PlaceOrder extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         txtTotalAmount = new javax.swing.JTextField();
         removeButton = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
         backButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -163,8 +170,13 @@ public class PlaceOrder extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton3.setText("Save & Print");
+        saveButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        saveButton.setText("Save & Print");
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
 
         backButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         backButton.setText("<<Back");
@@ -197,8 +209,8 @@ public class PlaceOrder extends javax.swing.JFrame {
                             .addComponent(jLabel4))))
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtorderId, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtorderDate, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(131, 131, 131))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -214,7 +226,7 @@ public class PlaceOrder extends javax.swing.JFrame {
                         .addGap(125, 125, 125)
                         .addComponent(removeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3)
+                        .addComponent(saveButton)
                         .addGap(58, 58, 58))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -249,7 +261,7 @@ public class PlaceOrder extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtorderId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CustIdCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addGap(25, 25, 25)
@@ -257,7 +269,7 @@ public class PlaceOrder extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(txtcustName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtorderDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(27, 27, 27)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -282,7 +294,7 @@ public class PlaceOrder extends javax.swing.JFrame {
                     .addComponent(txtTotalAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
+                    .addComponent(saveButton)
                     .addComponent(removeButton)
                     .addComponent(backButton))
                 .addContainerGap(38, Short.MAX_VALUE))
@@ -315,8 +327,85 @@ public class PlaceOrder extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_removeButtonActionPerformed
-    Connection con;
-    PreparedStatement psCustData,psItemData ;
+
+    private void clearAllFields() {
+        
+    // Clear combo boxes
+    CustIdCombo.setSelectedIndex(0);
+    itemIdCombo.setSelectedIndex(0);
+    
+    // Clear text fields
+    txtorderId.setText("");
+    txtcustName.setText("");
+    txtorderDate.setText("");
+    txtqty.setText("");
+    txtdescription.setText("");
+    txtUnitPrice.setText("");
+    txtQtyOnHand.setText("");
+    txtTotalAmount.setText("");
+    
+    // Clear JTable
+    DefaultTableModel model = (DefaultTableModel) showItem.getModel();
+    model.setRowCount(0);
+    }
+
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        // TODO add your handling code here:
+        
+         try {
+            // Get data from form fields
+            String orderId = txtorderId.getText(); // Order ID
+            String customerId = (String) CustIdCombo.getSelectedItem(); // Customer ID
+            // Order date (you can use SimpleDateFormat to format it according to your database schema)
+            String orderDate = txtorderDate.getText();
+            double totalAmount = Double.parseDouble(txtTotalAmount.getText()); // Total amount
+
+            // Get data from JTable and serialize into JSON
+            DefaultTableModel model = (DefaultTableModel) showItem.getModel();
+            int rowCount = model.getRowCount();
+            List<OrderItem> itemsList = new ArrayList<>();
+            for (int i = 0; i < rowCount; i++) {
+                String itemId = (String) model.getValueAt(i, 0);
+                String description = (String) model.getValueAt(i, 1);
+                int quantity = (int) model.getValueAt(i, 2);
+                double unitPrice = (double) model.getValueAt(i, 3);
+                double amount = (double) model.getValueAt(i, 4);
+                // Create OrderItem object
+                OrderItem item = new OrderItem(itemId, description, quantity, unitPrice,amount);
+                itemsList.add(item);
+            }
+
+            // Serialize itemsList to JSON using Gson
+            Gson gson = new Gson();
+            String itemsJson = gson.toJson(itemsList);
+
+            // Construct the SQL INSERT statement
+            String sql = "INSERT INTO new_order (order_id, cust_id, items, total_amount, order_date) VALUES (?, ?, ?, ?, ?)";
+
+            // Prepare the statement
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, orderId);
+            ps.setString(2, customerId);
+            ps.setString(3, itemsJson); // Store JSON string
+            ps.setDouble(4, totalAmount);
+            ps.setString(5, orderDate);
+
+            // Execute the statement
+            int rowsInserted = ps.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Data saved successfully.");
+                JOptionPane.showMessageDialog(this, "Data saved successfully.");
+                clearAllFields();
+            } else {
+                System.out.println("Failed to save data.");
+                JOptionPane.showMessageDialog(this, "Failed to save data.");
+            }
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        
+    }//GEN-LAST:event_saveButtonActionPerformed
+   
     
     private void updateTotalAmount() {
     double totalAmount = 0;
@@ -479,7 +568,6 @@ public class PlaceOrder extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> CustIdCombo;
     private javax.swing.JButton backButton;
     private javax.swing.JComboBox<String> itemIdCombo;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -493,15 +581,16 @@ public class PlaceOrder extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField4;
     private javax.swing.JButton removeButton;
+    private javax.swing.JButton saveButton;
     private javax.swing.JTable showItem;
     private javax.swing.JTextField txtQtyOnHand;
     private javax.swing.JTextField txtTotalAmount;
     private javax.swing.JTextField txtUnitPrice;
     private javax.swing.JTextField txtcustName;
     private javax.swing.JTextField txtdescription;
+    private javax.swing.JTextField txtorderDate;
+    private javax.swing.JTextField txtorderId;
     private javax.swing.JTextField txtqty;
     // End of variables declaration//GEN-END:variables
 }
