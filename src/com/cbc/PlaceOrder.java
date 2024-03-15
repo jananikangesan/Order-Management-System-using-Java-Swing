@@ -32,11 +32,48 @@ public class PlaceOrder extends javax.swing.JFrame {
      */
     Connection con;
     PreparedStatement psCustData,psItemData ;
+    
+   private String generateOrderID() {
+    try {
+        // Construct SQL query to retrieve the latest order ID
+        String sql = "SELECT MAX(order_id) AS max_order_id FROM new_order";
+
+        // Prepare the statement
+        PreparedStatement ps = con.prepareStatement(sql);
+
+        // Execute the query and get the result set
+        ResultSet rs = ps.executeQuery();
+
+        // Check if result set has data
+        if (rs.next()) {
+            // Get the latest order ID from the result set
+            String latestOrderID = rs.getString("max_order_id");
+
+            // Extract the numeric part from the order ID
+            String numericPart = latestOrderID.substring(3); // Skip the "ORD" prefix
+
+            // Parse the numeric part and increment it by one
+            int orderIDCounter = Integer.parseInt(numericPart) + 1;
+
+            // Format the incremented counter with leading zeros and concatenate with "ORD" prefix
+            return String.format("ORD%03d", orderIDCounter);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    // Default return value if unable to retrieve the latest order ID
+    return "ORD001"; // Default initial order ID if no orders exist in the database
+}
+    
     public PlaceOrder() {
         initComponents();
         connect();
         initBackButton();
         AddComboBoxData();
+        
+        // Generate the order ID when the form is initialized
+        txtorderId.setText(generateOrderID());
         
         CustIdCombo.addActionListener(this::ComboActionPerformed);
         itemIdCombo.addActionListener(this::ComboActionPerformed);
@@ -346,7 +383,7 @@ public class PlaceOrder extends javax.swing.JFrame {
     itemIdCombo.setSelectedIndex(0);
     
     // Clear text fields
-    txtorderId.setText("");
+    txtorderId.setText(generateOrderID());
     txtcustName.setText("");
     txtqty.setText("");
     txtdescription.setText("");
