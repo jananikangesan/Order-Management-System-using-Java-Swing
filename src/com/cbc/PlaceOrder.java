@@ -35,35 +35,29 @@ public class PlaceOrder extends javax.swing.JFrame {
     
    private String generateOrderID() {
     try {
-        // Construct SQL query to retrieve the latest order ID
+        
         String sql = "SELECT MAX(order_id) AS max_order_id FROM new_order";
 
-        // Prepare the statement
         PreparedStatement ps = con.prepareStatement(sql);
 
-        // Execute the query and get the result set
         ResultSet rs = ps.executeQuery();
 
-        // Check if result set has data
+        
         if (rs.next()) {
-            // Get the latest order ID from the result set
+            
             String latestOrderID = rs.getString("max_order_id");
 
-            // Extract the numeric part from the order ID
-            String numericPart = latestOrderID.substring(3); // Skip the "ORD" prefix
+            String numericPart = latestOrderID.substring(3); 
 
-            // Parse the numeric part and increment it by one
             int orderIDCounter = Integer.parseInt(numericPart) + 1;
 
-            // Format the incremented counter with leading zeros and concatenate with "ORD" prefix
             return String.format("ORD%03d", orderIDCounter);
         }
     } catch (SQLException e) {
         e.printStackTrace();
     }
 
-    // Default return value if unable to retrieve the latest order ID
-    return "ORD001"; // Default initial order ID if no orders exist in the database
+    return "ORD001";
 }
     
     public PlaceOrder() {
@@ -72,14 +66,13 @@ public class PlaceOrder extends javax.swing.JFrame {
         initBackButton();
         AddComboBoxData();
         
-        // Generate the order ID when the form is initialized
+        
         txtorderId.setText(generateOrderID());
         
         CustIdCombo.addActionListener(this::ComboActionPerformed);
         itemIdCombo.addActionListener(this::ComboActionPerformed);
         
         
-          // Add key listener to txtqty
     txtqty.addKeyListener(new java.awt.event.KeyAdapter() {
         public void keyPressed(java.awt.event.KeyEvent evt) {
             if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
@@ -88,26 +81,20 @@ public class PlaceOrder extends javax.swing.JFrame {
                 double unitPrice = Double.parseDouble(txtUnitPrice.getText());
                 int quantity = Integer.parseInt(txtqty.getText());
 
-                // Calculate total price
                 double totalPrice = unitPrice * quantity;
 
-                // Create a new row object with item details and total price
                 Object[] rowData = {selectedItem, description, quantity, unitPrice, totalPrice};
 
-                // Add the new row to the DefaultTableModel associated with the table (showItem)
                 DefaultTableModel model = (DefaultTableModel) showItem.getModel();
                 model.addRow(rowData);
 
-                // Update total amount field
                 updateTotalAmount();
             }
         }
     });
     
-    // Set current date and time in order date field
     setCurrentDateTime();
-             
-        
+                    
     }
 
     private void setCurrentDateTime() {
@@ -354,25 +341,23 @@ public class PlaceOrder extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-        // TODO add your handling code here:
-        
+     
         DefaultTableModel model = (DefaultTableModel) showItem.getModel();
         int selectedRow = showItem.getSelectedRow();
 
-        if (selectedRow != -1) { // Check if a row is selected
+        if (selectedRow != -1) { 
             
              int dialogResult=JOptionPane.showConfirmDialog(null, "Do you want to delete this item","Warning",JOptionPane.YES_NO_OPTION);
             
              if(dialogResult==JOptionPane.YES_OPTION){
-                 // Remove the selected row from the table model
+                
                 model.removeRow(selectedRow);
 
-                // Update total amount
                 updateTotalAmount();
              }
             
         } else {
-            // If no row is selected, display a message or handle the situation accordingly
+           
             System.out.println("Please select a row to remove.");
         }
         
@@ -401,17 +386,15 @@ public class PlaceOrder extends javax.swing.JFrame {
    }
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add your handling code here:
-       
+        
          try {
-        // Get data from form fields
-        String orderId = txtorderId.getText(); // Order ID
-        String customerId = (String) CustIdCombo.getSelectedItem(); // Customer ID
-        // Order date (you can use SimpleDateFormat to format it according to your database schema)
+        
+        String orderId = txtorderId.getText(); 
+        String customerId = (String) CustIdCombo.getSelectedItem(); 
+        
         String orderDate = txtorderDate.getText();
-        double totalAmount = Double.parseDouble(txtTotalAmount.getText()); // Total amount
+        double totalAmount = Double.parseDouble(txtTotalAmount.getText()); 
 
-        // Get data from JTable and serialize into JSON
         DefaultTableModel model = (DefaultTableModel) showItem.getModel();
         int rowCount = model.getRowCount();
         List<OrderItem> itemsList = new ArrayList<>();
@@ -421,7 +404,7 @@ public class PlaceOrder extends javax.swing.JFrame {
             int quantity = (int) model.getValueAt(i, 2);
             double unitPrice = (double) model.getValueAt(i, 3);
             double amount = (double) model.getValueAt(i, 4);
-            // Create OrderItem object
+            
             OrderItem item = new OrderItem(itemId, description, quantity, unitPrice, amount);
             itemsList.add(item);
         }
@@ -430,24 +413,23 @@ public class PlaceOrder extends javax.swing.JFrame {
         Gson gson = new Gson();
         String itemsJson = gson.toJson(itemsList);
 
-        // Construct the SQL INSERT statement
+        
         String sql = "INSERT INTO new_order (order_id, cust_id, items, total_amount, order_date) VALUES (?, ?, ?, ?, ?)";
 
-        // Prepare the statement
+        
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setString(1, orderId);
         ps.setString(2, customerId);
-        ps.setString(3, itemsJson); // Store JSON string
+        ps.setString(3, itemsJson); 
         ps.setDouble(4, totalAmount);
         ps.setString(5, orderDate);
 
-        // Execute the statement
+        
         int rowsInserted = ps.executeUpdate();
         if (rowsInserted > 0) {
             System.out.println("Data saved successfully.");
             JOptionPane.showMessageDialog(this, "Order placed successfully.");
 
-            // Update qty_on_hand in the item table
             for (OrderItem item : itemsList) {
                 updateQtyOnHand(item.getItemId(), item.getQuantity());
             }
@@ -464,13 +446,12 @@ public class PlaceOrder extends javax.swing.JFrame {
     }//GEN-LAST:event_saveButtonActionPerformed
    
     private void updateQtyOnHand(String itemId, int quantityOrdered) throws SQLException {
-        // Prepare SQL statement to update qty_on_hand
+        
         String sql = "UPDATE item SET qty_on_hand = qty_on_hand - ? WHERE item_id = ?";
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setInt(1, quantityOrdered);
         ps.setString(2, itemId);
 
-        // Execute the update statement
         ps.executeUpdate();
     }
     
@@ -479,7 +460,7 @@ public class PlaceOrder extends javax.swing.JFrame {
     DefaultTableModel model = (DefaultTableModel) showItem.getModel();
     int rowCount = model.getRowCount();
     for (int i = 0; i < rowCount; i++) {
-        Object totalPriceObj = model.getValueAt(i, 4); // Total price is at column index 4
+        Object totalPriceObj = model.getValueAt(i, 4); 
         if (totalPriceObj != null) {
             double totalPrice = (double) totalPriceObj;
             totalAmount += totalPrice;
@@ -505,10 +486,10 @@ public class PlaceOrder extends javax.swing.JFrame {
         backButton.addActionListener(e -> {
             MainFrame mainFrame = new MainFrame();
             mainFrame.setVisible(true);
-            dispose(); // Close the current Customer JFrame
+            dispose(); 
         });
         add(backButton);
-        backButton.setBounds(20, 485, 100, 30); // Adjust position and size as needed
+        backButton.setBounds(20, 485, 100, 30); 
     }
      public void AddComboBoxData() {
             try {
@@ -516,13 +497,13 @@ public class PlaceOrder extends javax.swing.JFrame {
                 ResultSet rsCust = psCustData.executeQuery();
                 
                   while (rsCust.next()) {
-                    // Populate both customer ID and customer name in the combo box
+                   
                     String customerId = rsCust.getString(1);
                     CustIdCombo.addItem(customerId);
                 }
 
 
-                psItemData = con.prepareStatement("select * from item"); // Changed from psCustData to psItemData
+                psItemData = con.prepareStatement("select * from item"); 
                 ResultSet rsItem = psItemData.executeQuery(); // 
 
               
@@ -537,26 +518,24 @@ public class PlaceOrder extends javax.swing.JFrame {
 
 
     private void ComboActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // Get the selected item from the combo box
+        
         String selectedCustomer = (String) CustIdCombo.getSelectedItem();
-        // Update the text field with the selected customer's name
+        
         txtcustName.setText(getCustomerName(selectedCustomer));
 
-        // Get the selected item from the combo box
         String selectedItem = (String) itemIdCombo.getSelectedItem();
-        System.out.println("Selected item: " + selectedItem); // Debug message
-
-        // Retrieve item details based on the selected item
+        System.out.println("Selected item: " + selectedItem); 
+        
         ResultSet itemDetails = getItem(selectedItem);
         try {
-            // Check if the result set is not null and has data
+            
             if (itemDetails != null && itemDetails.next()) {
-                // Set the description and unit price text fields with the retrieved data
+                
                 txtdescription.setText(itemDetails.getString("item_name"));
                 txtUnitPrice.setText(itemDetails.getString("unit_price"));
                 txtQtyOnHand.setText(itemDetails.getString("qty_on_hand"));
             } else {
-                System.out.println("No item details found for item code: " + selectedItem); // Debug message
+                System.out.println("No item details found for item code: " + selectedItem); 
             }
         } catch (SQLException ex) {
             Logger.getLogger(PlaceOrder.class.getName()).log(Level.SEVERE, null, ex);
@@ -564,8 +543,6 @@ public class PlaceOrder extends javax.swing.JFrame {
     
     }
                                           
-
-    // Method to retrieve customer name based on customer ID
     private String getCustomerName(String customerId) {
         String customerName = "";
         try {
