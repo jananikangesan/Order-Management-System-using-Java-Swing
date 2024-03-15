@@ -398,7 +398,7 @@ public class PlaceOrder extends javax.swing.JFrame {
     // Clear JTable
     DefaultTableModel model = (DefaultTableModel) showItem.getModel();
     model.setRowCount(0);
-    }
+   }
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add your handling code here:
@@ -445,7 +445,7 @@ public class PlaceOrder extends javax.swing.JFrame {
         int rowsInserted = ps.executeUpdate();
         if (rowsInserted > 0) {
             System.out.println("Data saved successfully.");
-            JOptionPane.showMessageDialog(this, "Data saved successfully.");
+            JOptionPane.showMessageDialog(this, "Order placed successfully.");
 
             // Update qty_on_hand in the item table
             for (OrderItem item : itemsList) {
@@ -455,7 +455,7 @@ public class PlaceOrder extends javax.swing.JFrame {
             clearAllFields();
         } else {
             System.out.println("Failed to save data.");
-            JOptionPane.showMessageDialog(this, "Failed to save data.");
+            JOptionPane.showMessageDialog(this, "Failed to place order.");
         }
     } catch (SQLException | NumberFormatException e) {
         e.printStackTrace();

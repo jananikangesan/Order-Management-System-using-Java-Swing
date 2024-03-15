@@ -45,18 +45,18 @@ public class MainFrame extends javax.swing.JFrame  implements ActionListener{
         jPanel1.setBackground(new java.awt.Color(255, 51, 153));
 
         customerButton.setBackground(new java.awt.Color(255, 255, 204));
-        customerButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        customerButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         customerButton.setText("Customer");
 
         itemButton.setBackground(new java.awt.Color(204, 255, 204));
-        itemButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        itemButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         itemButton.setText("Item");
 
         orderButton.setBackground(new java.awt.Color(204, 204, 255));
-        orderButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        orderButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         orderButton.setText("Order");
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(102, 0, 51));
         jLabel1.setText("Order Management System");
 
@@ -64,38 +64,38 @@ public class MainFrame extends javax.swing.JFrame  implements ActionListener{
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(91, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
                         .addComponent(customerButton)
-                        .addGap(39, 39, 39)
+                        .addGap(74, 74, 74)
                         .addComponent(itemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
-                        .addComponent(orderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
-                        .addComponent(jLabel1)))
-                .addContainerGap(35, Short.MAX_VALUE))
+                        .addGap(66, 66, 66)
+                        .addComponent(orderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(53, 53, 53))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(36, 36, 36)
+                .addGap(31, 31, 31)
                 .addComponent(jLabel1)
-                .addGap(79, 79, 79)
+                .addGap(84, 84, 84)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(customerButton)
                     .addComponent(itemButton)
                     .addComponent(orderButton))
-                .addContainerGap(161, Short.MAX_VALUE))
+                .addContainerGap(218, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
