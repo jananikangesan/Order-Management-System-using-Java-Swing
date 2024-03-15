@@ -385,7 +385,12 @@ public class PlaceOrder extends javax.swing.JFrame {
                 // Create OrderItem object
                 OrderItem item = new OrderItem(itemId, description, quantity, unitPrice,amount);
                 itemsList.add(item);
+                
+                // Update qty_on_hand in the item table
+                updateQtyOnHand(itemId, quantity);
             }
+            
+            
 
             // Serialize itemsList to JSON using Gson
             Gson gson = new Gson();
@@ -418,6 +423,16 @@ public class PlaceOrder extends javax.swing.JFrame {
         
     }//GEN-LAST:event_saveButtonActionPerformed
    
+    private void updateQtyOnHand(String itemId, int quantityOrdered) throws SQLException {
+        // Prepare SQL statement to update qty_on_hand
+        String sql = "UPDATE item SET qty_on_hand = qty_on_hand - ? WHERE item_id = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, quantityOrdered);
+        ps.setString(2, itemId);
+
+        // Execute the update statement
+        ps.executeUpdate();
+    }
     
     private void updateTotalAmount() {
     double totalAmount = 0;
