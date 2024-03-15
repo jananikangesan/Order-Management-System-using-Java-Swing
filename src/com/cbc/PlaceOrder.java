@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -64,10 +66,19 @@ public class PlaceOrder extends javax.swing.JFrame {
             }
         }
     });
+    
+    // Set current date and time in order date field
+    setCurrentDateTime();
              
         
     }
 
+    private void setCurrentDateTime() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
+        txtorderDate.setText(formattedDateTime);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -337,12 +348,13 @@ public class PlaceOrder extends javax.swing.JFrame {
     // Clear text fields
     txtorderId.setText("");
     txtcustName.setText("");
-    txtorderDate.setText("");
     txtqty.setText("");
     txtdescription.setText("");
     txtUnitPrice.setText("");
     txtQtyOnHand.setText("");
     txtTotalAmount.setText("");
+    
+    setCurrentDateTime();
     
     // Clear JTable
     DefaultTableModel model = (DefaultTableModel) showItem.getModel();
