@@ -116,6 +116,8 @@ public class PlaceOrder extends javax.swing.JFrame {
         String formattedDateTime = currentDateTime.format(formatter);
         txtorderDate.setText(formattedDateTime);
     }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -400,64 +402,65 @@ public class PlaceOrder extends javax.swing.JFrame {
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add your handling code here:
-        
+       
          try {
-            // Get data from form fields
-            String orderId = txtorderId.getText(); // Order ID
-            String customerId = (String) CustIdCombo.getSelectedItem(); // Customer ID
-            // Order date (you can use SimpleDateFormat to format it according to your database schema)
-            String orderDate = txtorderDate.getText();
-            double totalAmount = Double.parseDouble(txtTotalAmount.getText()); // Total amount
+        // Get data from form fields
+        String orderId = txtorderId.getText(); // Order ID
+        String customerId = (String) CustIdCombo.getSelectedItem(); // Customer ID
+        // Order date (you can use SimpleDateFormat to format it according to your database schema)
+        String orderDate = txtorderDate.getText();
+        double totalAmount = Double.parseDouble(txtTotalAmount.getText()); // Total amount
 
-            // Get data from JTable and serialize into JSON
-            DefaultTableModel model = (DefaultTableModel) showItem.getModel();
-            int rowCount = model.getRowCount();
-            List<OrderItem> itemsList = new ArrayList<>();
-            for (int i = 0; i < rowCount; i++) {
-                String itemId = (String) model.getValueAt(i, 0);
-                String description = (String) model.getValueAt(i, 1);
-                int quantity = (int) model.getValueAt(i, 2);
-                double unitPrice = (double) model.getValueAt(i, 3);
-                double amount = (double) model.getValueAt(i, 4);
-                // Create OrderItem object
-                OrderItem item = new OrderItem(itemId, description, quantity, unitPrice,amount);
-                itemsList.add(item);
-                
-                // Update qty_on_hand in the item table
-                updateQtyOnHand(itemId, quantity);
-            }
-            
-            
-
-            // Serialize itemsList to JSON using Gson
-            Gson gson = new Gson();
-            String itemsJson = gson.toJson(itemsList);
-
-            // Construct the SQL INSERT statement
-            String sql = "INSERT INTO new_order (order_id, cust_id, items, total_amount, order_date) VALUES (?, ?, ?, ?, ?)";
-
-            // Prepare the statement
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, orderId);
-            ps.setString(2, customerId);
-            ps.setString(3, itemsJson); // Store JSON string
-            ps.setDouble(4, totalAmount);
-            ps.setString(5, orderDate);
-
-            // Execute the statement
-            int rowsInserted = ps.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Data saved successfully.");
-                JOptionPane.showMessageDialog(this, "Data saved successfully.");
-                clearAllFields();
-            } else {
-                System.out.println("Failed to save data.");
-                JOptionPane.showMessageDialog(this, "Failed to save data.");
-            }
-        } catch (SQLException | NumberFormatException e) {
-            e.printStackTrace();
+        // Get data from JTable and serialize into JSON
+        DefaultTableModel model = (DefaultTableModel) showItem.getModel();
+        int rowCount = model.getRowCount();
+        List<OrderItem> itemsList = new ArrayList<>();
+        for (int i = 0; i < rowCount; i++) {
+            String itemId = (String) model.getValueAt(i, 0);
+            String description = (String) model.getValueAt(i, 1);
+            int quantity = (int) model.getValueAt(i, 2);
+            double unitPrice = (double) model.getValueAt(i, 3);
+            double amount = (double) model.getValueAt(i, 4);
+            // Create OrderItem object
+            OrderItem item = new OrderItem(itemId, description, quantity, unitPrice, amount);
+            itemsList.add(item);
         }
-        
+
+        // Serialize itemsList to JSON using Gson
+        Gson gson = new Gson();
+        String itemsJson = gson.toJson(itemsList);
+
+        // Construct the SQL INSERT statement
+        String sql = "INSERT INTO new_order (order_id, cust_id, items, total_amount, order_date) VALUES (?, ?, ?, ?, ?)";
+
+        // Prepare the statement
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, orderId);
+        ps.setString(2, customerId);
+        ps.setString(3, itemsJson); // Store JSON string
+        ps.setDouble(4, totalAmount);
+        ps.setString(5, orderDate);
+
+        // Execute the statement
+        int rowsInserted = ps.executeUpdate();
+        if (rowsInserted > 0) {
+            System.out.println("Data saved successfully.");
+            JOptionPane.showMessageDialog(this, "Data saved successfully.");
+
+            // Update qty_on_hand in the item table
+            for (OrderItem item : itemsList) {
+                updateQtyOnHand(item.getItemId(), item.getQuantity());
+            }
+            
+            clearAllFields();
+        } else {
+            System.out.println("Failed to save data.");
+            JOptionPane.showMessageDialog(this, "Failed to save data.");
+        }
+    } catch (SQLException | NumberFormatException e) {
+        e.printStackTrace();
+    }
+         
     }//GEN-LAST:event_saveButtonActionPerformed
    
     private void updateQtyOnHand(String itemId, int quantityOrdered) throws SQLException {
