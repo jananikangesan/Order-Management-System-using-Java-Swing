@@ -33,6 +33,7 @@ public class PlaceOrder extends javax.swing.JFrame {
     Connection con;
     PreparedStatement psCustData,psItemData ;
     
+   // generate order id 
    private String generateOrderID() {
     try {
         
@@ -59,20 +60,20 @@ public class PlaceOrder extends javax.swing.JFrame {
 
     return "ORD001";
 }
-    
+    //constructor
     public PlaceOrder() {
         initComponents();
         connect();
         initBackButton();
         AddComboBoxData();
         
-        
+         // Generate the order ID when the form is initialized
         txtorderId.setText(generateOrderID());
         
         CustIdCombo.addActionListener(this::ComboActionPerformed);
         itemIdCombo.addActionListener(this::ComboActionPerformed);
         
-        
+    // Add key listener to txtqty   
     txtqty.addKeyListener(new java.awt.event.KeyAdapter() {
         public void keyPressed(java.awt.event.KeyEvent evt) {
             if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
@@ -93,10 +94,12 @@ public class PlaceOrder extends javax.swing.JFrame {
         }
     });
     
+    // Set current date and time in order date field
     setCurrentDateTime();
                     
     }
-
+    
+    // set the current date and time to the order date field
     private void setCurrentDateTime() {
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -340,6 +343,7 @@ public class PlaceOrder extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //operation of remove button
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
      
         DefaultTableModel model = (DefaultTableModel) showItem.getModel();
@@ -363,6 +367,7 @@ public class PlaceOrder extends javax.swing.JFrame {
         
     }//GEN-LAST:event_removeButtonActionPerformed
 
+    // Clear the fields
     private void clearAllFields() {
         
     // Clear combo boxes
@@ -385,6 +390,7 @@ public class PlaceOrder extends javax.swing.JFrame {
     model.setRowCount(0);
    }
 
+    // save the order into the database
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         
          try {
@@ -445,6 +451,7 @@ public class PlaceOrder extends javax.swing.JFrame {
          
     }//GEN-LAST:event_saveButtonActionPerformed
    
+    //updating qty on hand
     private void updateQtyOnHand(String itemId, int quantityOrdered) throws SQLException {
         
         String sql = "UPDATE item SET qty_on_hand = qty_on_hand - ? WHERE item_id = ?";
@@ -455,21 +462,22 @@ public class PlaceOrder extends javax.swing.JFrame {
         ps.executeUpdate();
     }
     
+    //updating total amount 
     private void updateTotalAmount() {
-    double totalAmount = 0;
-    DefaultTableModel model = (DefaultTableModel) showItem.getModel();
-    int rowCount = model.getRowCount();
-    for (int i = 0; i < rowCount; i++) {
-        Object totalPriceObj = model.getValueAt(i, 4); 
-        if (totalPriceObj != null) {
-            double totalPrice = (double) totalPriceObj;
-            totalAmount += totalPrice;
+        double totalAmount = 0;
+        DefaultTableModel model = (DefaultTableModel) showItem.getModel();
+        int rowCount = model.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            Object totalPriceObj = model.getValueAt(i, 4); 
+            if (totalPriceObj != null) {
+                double totalPrice = (double) totalPriceObj;
+                totalAmount += totalPrice;
+            }
         }
-    }
-    txtTotalAmount.setText(String.valueOf(totalAmount));
+        txtTotalAmount.setText(String.valueOf(totalAmount));
 }
 
-    
+    // connecting the application to the Database
     public void connect() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -481,6 +489,7 @@ public class PlaceOrder extends javax.swing.JFrame {
         }
 
     }
+    //operation of back button
     private void initBackButton() {
        
         backButton.addActionListener(e -> {
@@ -491,7 +500,9 @@ public class PlaceOrder extends javax.swing.JFrame {
         add(backButton);
         backButton.setBounds(20, 485, 100, 30); 
     }
-     public void AddComboBoxData() {
+    
+    // add/display the data into the combo box
+    public void AddComboBoxData() {
             try {
                 psCustData = con.prepareStatement("select * from customer");
                 ResultSet rsCust = psCustData.executeQuery();
@@ -516,7 +527,7 @@ public class PlaceOrder extends javax.swing.JFrame {
             }
     }
 
-
+     // combo box actions
     private void ComboActionPerformed(java.awt.event.ActionEvent evt) {                                            
         
         String selectedCustomer = (String) CustIdCombo.getSelectedItem();
@@ -542,7 +553,8 @@ public class PlaceOrder extends javax.swing.JFrame {
         }
     
     }
-                                          
+    
+    // Method to retrieve customer name based on customer ID                                     
     private String getCustomerName(String customerId) {
         String customerName = "";
         try {
@@ -557,6 +569,8 @@ public class PlaceOrder extends javax.swing.JFrame {
         }
         return customerName;
     }
+    
+    // Method to retrieve item's details based on item ID
      private ResultSet getItem(String itemId) {
        
         ResultSet rs = null;
